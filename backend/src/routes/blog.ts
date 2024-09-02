@@ -19,14 +19,18 @@ bookRouter.use(async (c, next) => {
     c.status(401);
     return c.json({ error: "unauthorized" });
   }
-  const token = jwt.split(" ")[1];
-  const payload = await verify(token, c.env.JWT_SECRET);
-  if (!payload) {
-    c.status(401);
-    return c.json({ error: "unauthorized" });
+  try {
+    const token = jwt.split(" ")[1];
+    const payload = await verify(token, c.env.JWT_SECRET);
+    if (!payload) {
+      c.status(401);
+      return c.json({ error: "unauthorized" }, 403);
+    }
+    c.set("userId", payload.id as string);
+    await next();
+  } catch (e) {
+    return c.json({ msg: "You are not logged in" }, 403);
   }
-  c.set("userId", payload.id as string);
-  await next();
 });
 
 bookRouter.post("/", async (c) => {
