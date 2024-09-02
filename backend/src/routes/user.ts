@@ -18,7 +18,7 @@ userRouter.post("/signup", async (c) => {
 
   try {
     const body = await c.req.json();
-    const { success } = signUpBody.safeParse(body);
+    const success = signUpBody.safeParse(body);
     if (!success) {
       return c.json({ msg: "invalid inputs" }, 400);
     }
@@ -55,7 +55,7 @@ userRouter.post("/signin", async (c) => {
     }).$extends(withAccelerate());
 
     const body = await c.req.json();
-    const { success } = signInBody.safeParse(body);
+    const success = signInBody.safeParse(body);
     if (!success) {
       return c.json({ msg: "invalid inputs" }, 400);
     }
@@ -72,7 +72,7 @@ userRouter.post("/signin", async (c) => {
     }
 
     const jwt = await sign({ id: user.id }, c.env.JWT_SECRET);
-    return c.json({ token: jwt });
+    return c.json({ jwt });
   } catch (e) {
     return c.json({ error: e }, 500);
   }

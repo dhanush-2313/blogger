@@ -42,7 +42,7 @@ bookRouter.post("/", async (c) => {
     }).$extends(withAccelerate());
 
     const body = await c.req.json();
-    const { success } = createBlogInput.safeParse(body);
+    const success = createBlogInput.safeParse(body);
     if (!success) {
       return c.json({ msg: "invalid inputs" }, 400);
     }
@@ -69,7 +69,7 @@ bookRouter.put("/", async (c) => {
     }).$extends(withAccelerate());
 
     const body = await c.req.json();
-    const { success } = updateBlogInput.safeParse(body);
+    const success = updateBlogInput.safeParse(body);
     if (!success) {
       return c.json({ msg: "invalid inputs" }, 400);
     }
@@ -96,7 +96,18 @@ bookRouter.get("/bulk", async (c) => {
       datasourceUrl: c.env?.DATABASE_URL,
     }).$extends(withAccelerate());
 
-    const posts = await prisma.blog.findMany({});
+    const posts = await prisma.blog.findMany({
+      select: {
+        content: true,
+        title: true,
+        id: true,
+        author: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
 
     return c.json(posts);
   } catch (e) {
