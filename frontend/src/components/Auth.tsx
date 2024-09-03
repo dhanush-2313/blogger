@@ -2,7 +2,7 @@ import { ChangeEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { SignupInput } from "@dhanush2313/blogger-common";
 import axios from "axios";
-import { BACKEND_URL } from "../config";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 export const Auth = ({ type }: { type: "signup" | "signin" }) => {
   const [postInputs, setPostInputs] = useState<SignupInput>({
