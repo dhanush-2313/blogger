@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 export interface Blog {
@@ -35,6 +36,8 @@ export const useBlog = ({ id }: { id: string }) => {
 export const useBLogs = () => {
   const [loading, setLoading] = useState(true);
   const [blogs, setBlogs] = useState<Blog[]>([]);
+  const navigate = useNavigate();
+  const alertShown = useRef(false);
 
   useEffect(() => {
     axios
@@ -46,6 +49,13 @@ export const useBLogs = () => {
       .then((res) => {
         setBlogs(res.data);
         setLoading(false);
+      })
+      .catch(() => {
+        if (!alertShown.current) {
+          alert("Log in / Sign up first!");
+          alertShown.current = true;
+        }
+        navigate("/signin");
       });
   }, []);
 

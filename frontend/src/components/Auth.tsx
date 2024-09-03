@@ -1,6 +1,7 @@
 import { ChangeEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { SignupInput } from "@dhanush2313/blogger-common";
+
 import axios from "axios";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -10,9 +11,11 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
     email: "",
     password: "",
   });
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   async function sendRequest() {
+    setLoading(true);
     try {
       const response = await axios.post(
         `${BACKEND_URL}/api/v1/user/${type === "signup" ? "signup" : "signin"}`,
@@ -20,8 +23,10 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
       );
       const { jwt } = response.data;
       localStorage.setItem("token", jwt);
+      setLoading(false);
       navigate("/blogs");
     } catch (e) {
+      setLoading(false);
       alert("Error while signing up/in");
     }
   }
@@ -82,6 +87,30 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
                 }));
               }}
             />
+            {loading && (
+              <div className="flex justify-center items-center mt-2">
+                <div
+                  style={{
+                    border: "4px solid rgba(0, 0, 0, 0.1)",
+                    width: "24px",
+                    height: "24px",
+                    borderRadius: "50%",
+                    borderLeftColor: "#09f",
+                    animation: "spin 1s linear infinite",
+                  }}
+                ></div>
+              </div>
+            )}
+
+            <style>
+              {`
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  `}
+            </style>
             <button
               onClick={sendRequest}
               type="button"
@@ -118,7 +147,7 @@ function LabelledInput({
         <input
           onChange={onChange}
           type={type}
-          id="first_name"
+          id={type}
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
           placeholder={placeholder}
           required
