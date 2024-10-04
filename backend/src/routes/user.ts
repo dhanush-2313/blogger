@@ -6,8 +6,9 @@ import { signUpBody, signInBody } from "@dhanush2313/blogger-common";
 
 export const userRouter = new Hono<{
   Bindings: {
-    DATABASE_URL: string;
-    JWT_SECRET: string;
+    DATABASE_URL: string,
+    JWT_SECRET: string,
+    PORT: string
   };
 }>();
 
@@ -53,12 +54,16 @@ userRouter.post("/signin", async (c) => {
     const prisma = new PrismaClient({
       datasourceUrl: c.env?.DATABASE_URL,
     }).$extends(withAccelerate());
+    console.log(c.env?.DATABASE_URL);
+    console.log(c);
 
     const body = await c.req.json();
     const success = signInBody.safeParse(body);
     if (!success) {
       return c.json({ msg: "invalid inputs" }, 400);
     }
+    console.log("checked");
+
     const user = await prisma.user.findUnique({
       where: {
         email: body.email,
@@ -66,10 +71,15 @@ userRouter.post("/signin", async (c) => {
       },
     });
 
+    console.log(user);
+
     if (!user) {
       c.status(403);
       return c.json({ error: "user not found" });
     }
+    console.log("JWT_SECRET:", c.env.JWT_SECRET);
+    console.log("PORT:", c.env.PORT);
+
 
     const jwt = await sign({ id: user.id }, c.env.JWT_SECRET);
     return c.json({ jwt });

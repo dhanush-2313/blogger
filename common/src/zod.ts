@@ -9,7 +9,7 @@ export const signUpBody = z.object({
 export type SignupInput = z.infer<typeof signUpBody>;
 
 export const signInBody = z.object({
-  username: z.string().email(),
+  email: z.string().email(),
   password: z.string().min(6),
 });
 
